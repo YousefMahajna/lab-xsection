@@ -1,0 +1,24 @@
+rules_version = '2';
+service firebase.storage {
+  match /b/{bucket}/o {
+    // Merge this match into existing Storage rules; preserve other apps' rules.
+    // This deliberately matches the existing X-section name-only session model.
+    match /xsection/{uploader}/{requestId}/{fileName} {
+      function labSession() {
+        return request.auth != null && (
+          request.auth.token.firebase.sign_in_provider == 'anonymous' ||
+          (request.auth.token.email_verified == true && request.auth.token.email.matches('.*@nvidia[.]com'))
+        );
+      }
+      allow read: if labSession();
+      allow create: if labSession() && request.auth.uid == uploader
+        && requestId.matches('XS-[A-Z0-9-]{5,70}')
+        && request.resource.size > 0 && request.resource.size <= 60000000
+        && (request.resource.contentType.matches('image/(jpeg|png|webp|gif|bmp)')
+          || fileName.matches('.*[.](pdf|step|stp|stl|obj|iges|igs|glb|gltf|STEP|STP|STL|PDF)'));
+      allow update: if false;
+      allow delete: if request.auth != null && request.auth.token.email_verified == true
+        && request.auth.token.email == 'ymahajna@nvidia.com';
+    }
+  }
+}

@@ -13,12 +13,17 @@
   if(!r||typeof r!=='object'||!/^XS-[A-Z0-9-]{5,70}$/.test(r.id||''))throw Error('Invalid request ID.');
   if(!['open','progress','review','done','closed'].includes(r.status))throw Error('Invalid request status.');
   if(!Array.isArray(r.messages)||r.messages.length>1000)throw Error('Invalid request messages.');
-  const image=s=>typeof s==='string'&&s.length<=6000000&&/^data:image\/(png|jpeg|webp|gif);base64,[A-Za-z0-9+/=\r\n]+$/.test(s);
+  const cloud=s=>{try{const u=new URL(s);return u.protocol==='https:'&&u.hostname==='firebasestorage.googleapis.com'&&u.pathname.startsWith('/v0/b/lab-tracker-nvidia.firebasestorage.app/o/xsection%2F')&&!u.username&&!u.password;}catch{return false;}};
+  const image=s=>typeof s==='string'&&s.length<=6000000&&(/^data:image\/(png|jpeg|webp|gif);base64,[A-Za-z0-9+/=\r\n]+$/.test(s)||cloud(s));
   if(r.canvasDrawing&&!image(r.canvasDrawing))throw Error('Cut drawings must be PNG, JPEG, WebP or GIF images.');
   if(r.analyst&&!/^[A-Za-z0-9_-]{1,128}$/.test(r.analyst))throw Error('Invalid analyst ID.');
   if(!/^[A-Za-z0-9_-]{1,128}$/.test(r.requester||''))throw Error('Invalid requester ID.');
   for(const m of r.messages){if(!/^[A-Za-z0-9_-]{1,128}$/.test(m.id||'')||!/^[A-Za-z0-9_-]{1,128}$/.test(m.author||'')||typeof m.text!=='string'||!Array.isArray(m.images)||m.images.length>12||m.images.some(s=>!image(s))||!Array.isArray(m.measurements)||m.measurements.some(s=>typeof s!=='string'))throw Error('Invalid message or attachment.');}
-  if(JSON.stringify(r).length>8000000)throw Error('This request is too large. Use fewer or smaller images.');return r;
+  if(r.archiveURL){try{if(new URL(r.archiveURL).protocol!=='https:')throw Error();}catch{throw Error('Reference links must use HTTPS.');}}
+  if(r.results&&Object.values(r.results).some(v=>typeof v!=='string'||v.length>50000))throw Error('Summary fields must be text of at most 50,000 characters.');
+  if(r.resultMeasurements)for(const m of Object.values(r.resultMeasurements)){if(!m||typeof m.feature!=='string'||m.feature.length>1000||!Number.isFinite(m.value)||!['µm','mm','nm','%','°','px'].includes(m.unit)||(m.min!=null&&!Number.isFinite(m.min))||(m.max!=null&&!Number.isFinite(m.max)))throw Error('Invalid measurement.');}
+  if(r.referenceFiles)for(const f of Object.values(r.referenceFiles)){if(!f||!cloud(f.url)||typeof f.name!=='string'||f.name.length>1000||!(f.bytes>0&&f.bytes<=60000000))throw Error('Invalid reference file.');}
+  if(JSON.stringify(r).length>8000000)throw Error('This request has reached its 8 MB embedded-image capacity. Add fewer pictures, or enable full-resolution file storage to keep images outside the request record.');return r;
  }
  function create({databaseURL,auth,fetch:fetcher=globalThis.fetch.bind(globalThis)}){
   const base=databaseURL.replace(/\/$/,'')+'/xsectionSharedV1/requests';let serial=Promise.resolve();
