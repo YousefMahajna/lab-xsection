@@ -15,4 +15,11 @@ jobs:
           node-version: '24'
       - run: npm run check
       - run: npm test
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '21'
+      - name: Compile and exercise real Firebase rules locally
+        run: node tests/emulator-rules.cjs
+
 
