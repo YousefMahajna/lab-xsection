@@ -1,0 +1,344 @@
+{
+  "rules": {
+    ".read": false,
+    ".write": false,
+    "appState": {
+      ".write": true,
+      ".read": true
+    },
+    "processRecipeLibrary": {
+      ".write": true,
+      ".read": true
+    },
+    "adhesiveAccessV1": {
+      ".write": "(auth != null && auth.token.email != null && auth.token.email_verified == true && auth.token.email.toLowerCase().matches(/^[^@]+@nvidia[.]com$/) && auth.token.email.toLowerCase() == 'ymahajna@nvidia.com') && newData.exists()",
+      ".validate": "newData.hasChildren(['schema','defaultLevel','updatedAt'])",
+      "schema": {
+        ".validate": "newData.val() == 1"
+      },
+      "defaultLevel": {
+        ".validate": "newData.val() == 'none' || newData.val() == 'viewer' || newData.val() == 'editor' || newData.val() == 'manager' || newData.val() == 'admin'"
+      },
+      "updatedAt": {
+        ".validate": "newData.isString()"
+      },
+      "users": {
+        "$email": {
+          ".validate": "newData.hasChildren(['name','level'])",
+          "name": {
+            ".validate": "newData.isString()"
+          },
+          "level": {
+            ".validate": "newData.val() == 'none' || newData.val() == 'viewer' || newData.val() == 'editor' || newData.val() == 'manager' || newData.val() == 'admin'"
+          },
+          "$other": {
+            ".validate": false
+          }
+        }
+      },
+      "$other": {
+        ".validate": false
+      },
+      ".read": true
+    },
+    "adhesivesSharedV1": {
+      ".write": "newData.exists() && ((!data.exists() && (auth != null && auth.token.email != null && auth.token.email_verified == true && auth.token.email.toLowerCase().matches(/^[^@]+@nvidia[.]com$/) && auth.token.email.toLowerCase() == 'ymahajna@nvidia.com')) || (data.exists() && (auth != null && auth.token.email != null && auth.token.email_verified == true && auth.token.email.toLowerCase().matches(/^[^@]+@nvidia[.]com$/) && ((auth != null && auth.token.email != null && auth.token.email_verified == true && auth.token.email.toLowerCase().matches(/^[^@]+@nvidia[.]com$/) && auth.token.email.toLowerCase() == 'ymahajna@nvidia.com') || (root.child('adhesiveAccessV1/users').child(auth.token.email.toLowerCase().replace('.', ',')).child('level').val() == 'editor' || (!root.child('adhesiveAccessV1/users').child(auth.token.email.toLowerCase().replace('.', ',')).child('level').exists() && root.child('adhesiveAccessV1/defaultLevel').val() == 'editor')) || (root.child('adhesiveAccessV1/users').child(auth.token.email.toLowerCase().replace('.', ',')).child('level').val() == 'manager' || (!root.child('adhesiveAccessV1/users').child(auth.token.email.toLowerCase().replace('.', ',')).child('level').exists() && root.child('adhesiveAccessV1/defaultLevel').val() == 'manager')) || (root.child('adhesiveAccessV1/users').child(auth.token.email.toLowerCase().replace('.', ',')).child('level').val() == 'admin' || (!root.child('adhesiveAccessV1/users').child(auth.token.email.toLowerCase().replace('.', ',')).child('level').exists() && root.child('adhesiveAccessV1/defaultLevel').val() == 'admin'))))))",
+      ".validate": "newData.hasChildren(['schema','initialized','revision','updatedAt','inventoryJSON','shipmentsJSON','extraJSON'])",
+      "schema": {
+        ".validate": "newData.val() == 2"
+      },
+      "initialized": {
+        ".validate": "newData.val() == true"
+      },
+      "revision": {
+        ".validate": "newData.isNumber() && newData.val() >= 1 && (!data.exists() || newData.val() >= data.val())"
+      },
+      "updatedAt": {
+        ".validate": "newData.isString()"
+      },
+      "inventoryJSON": {
+        ".validate": "newData.isString()"
+      },
+      "shipmentsJSON": {
+        ".validate": "newData.isString()"
+      },
+      "extraJSON": {
+        ".validate": "newData.isString()"
+      },
+      "comments": {
+        "$comment": {
+          ".write": "root.child('adhesivesSharedV1/initialized').val() == true && !data.exists() && newData.exists() && (auth != null && auth.token.email != null && auth.token.email_verified == true && auth.token.email.toLowerCase().matches(/^[^@]+@nvidia[.]com$/) && ((auth != null && auth.token.email != null && auth.token.email_verified == true && auth.token.email.toLowerCase().matches(/^[^@]+@nvidia[.]com$/) && auth.token.email.toLowerCase() == 'ymahajna@nvidia.com') || (root.child('adhesiveAccessV1/users').child(auth.token.email.toLowerCase().replace('.', ',')).child('level').val() == 'viewer' || (!root.child('adhesiveAccessV1/users').child(auth.token.email.toLowerCase().replace('.', ',')).child('level').exists() && root.child('adhesiveAccessV1/defaultLevel').val() == 'viewer')) || (root.child('adhesiveAccessV1/users').child(auth.token.email.toLowerCase().replace('.', ',')).child('level').val() == 'editor' || (!root.child('adhesiveAccessV1/users').child(auth.token.email.toLowerCase().replace('.', ',')).child('level').exists() && root.child('adhesiveAccessV1/defaultLevel').val() == 'editor')) || (root.child('adhesiveAccessV1/users').child(auth.token.email.toLowerCase().replace('.', ',')).child('level').val() == 'manager' || (!root.child('adhesiveAccessV1/users').child(auth.token.email.toLowerCase().replace('.', ',')).child('level').exists() && root.child('adhesiveAccessV1/defaultLevel').val() == 'manager')) || (root.child('adhesiveAccessV1/users').child(auth.token.email.toLowerCase().replace('.', ',')).child('level').val() == 'admin' || (!root.child('adhesiveAccessV1/users').child(auth.token.email.toLowerCase().replace('.', ',')).child('level').exists() && root.child('adhesiveAccessV1/defaultLevel').val() == 'admin')))) && newData.child('createdBy').val() == auth.uid",
+          ".validate": "newData.hasChildren(['id','json','createdBy','order']) && $comment == 'c_' + newData.child('id').val()",
+          "id": {
+            ".validate": "newData.isNumber() || newData.isString()"
+          },
+          "json": {
+            ".validate": "newData.isString()"
+          },
+          "createdBy": {
+            ".validate": "newData.isString()"
+          },
+          "order": {
+            ".validate": "newData.isNumber()"
+          },
+          "$other": {
+            ".validate": false
+          }
+        }
+      },
+      "files": {
+        "$file": {
+          ".validate": "newData.hasChild('name') && (newData.hasChild('content') || newData.hasChild('raw_url'))",
+          "name": {
+            ".validate": "newData.isString()"
+          },
+          "content": {
+            ".validate": "newData.isString()"
+          },
+          "raw_url": {
+            ".validate": "newData.isString() && newData.val().beginsWith('https://gist.githubusercontent.com/YousefMahajna/')"
+          }
+        }
+      },
+      "$other": {
+        ".validate": false
+      },
+      ".read": true
+    },
+    "activitiesAccessV1": {
+      ".write": "(auth != null && auth.token.email != null && auth.token.email_verified == true && auth.token.email.toLowerCase().matches(/^[^@]+@nvidia[.]com$/) && auth.token.email.toLowerCase() == 'ymahajna@nvidia.com') && newData.exists()",
+      ".validate": "newData.hasChildren(['schema','defaultLevel','updatedAt'])",
+      "schema": {
+        ".validate": "newData.val() == 1"
+      },
+      "defaultLevel": {
+        ".validate": "newData.val() == 'none' || newData.val() == 'viewer' || newData.val() == 'editor' || newData.val() == 'manager' || newData.val() == 'admin'"
+      },
+      "updatedAt": {
+        ".validate": "newData.isString()"
+      },
+      "users": {
+        "$email": {
+          ".validate": "newData.hasChildren(['name','level'])",
+          "name": {
+            ".validate": "newData.isString()"
+          },
+          "level": {
+            ".validate": "newData.val() == 'none' || newData.val() == 'viewer' || newData.val() == 'editor' || newData.val() == 'manager' || newData.val() == 'admin'"
+          },
+          "$other": {
+            ".validate": false
+          }
+        }
+      },
+      "$other": {
+        ".validate": false
+      },
+      ".read": true
+    },
+    "activitiesJournalV1": {
+      ".read": "(auth != null && auth.token.firebase.sign_in_provider == 'anonymous') || ((auth != null && auth.token.email != null && auth.token.email_verified == true && auth.token.email.toLowerCase().matches(/^[^@]+@nvidia[.]com$/)) && ((((auth != null && auth.token.email != null && auth.token.email_verified == true && auth.token.email.toLowerCase().matches(/^[^@]+@nvidia[.]com$/) && auth.token.email.toLowerCase() == 'ymahajna@nvidia.com') || (root.child('activitiesAccessV1/users').child(auth.token.email.toLowerCase().replace('.', ',')).child('level').val() == 'manager' || (!root.child('activitiesAccessV1/users').child(auth.token.email.toLowerCase().replace('.', ',')).child('level').exists() && root.child('activitiesAccessV1/defaultLevel').val() == 'manager')) || (root.child('activitiesAccessV1/users').child(auth.token.email.toLowerCase().replace('.', ',')).child('level').val() == 'admin' || (!root.child('activitiesAccessV1/users').child(auth.token.email.toLowerCase().replace('.', ',')).child('level').exists() && root.child('activitiesAccessV1/defaultLevel').val() == 'admin'))) || (root.child('activitiesAccessV1/users').child(auth.token.email.toLowerCase().replace('.', ',')).child('level').val() == 'editor' || (!root.child('activitiesAccessV1/users').child(auth.token.email.toLowerCase().replace('.', ',')).child('level').exists() && root.child('activitiesAccessV1/defaultLevel').val() == 'editor'))) || (root.child('activitiesAccessV1/users').child(auth.token.email.toLowerCase().replace('.', ',')).child('level').val() == 'viewer' || (!root.child('activitiesAccessV1/users').child(auth.token.email.toLowerCase().replace('.', ',')).child('level').exists() && root.child('activitiesAccessV1/defaultLevel').val() == 'viewer'))))",
+      ".write": "(auth != null && auth.token.email != null && auth.token.email_verified == true && auth.token.email.toLowerCase().matches(/^[^@]+@nvidia[.]com$/) && auth.token.email.toLowerCase() == 'ymahajna@nvidia.com') && !data.exists() && newData.exists()",
+      ".validate": "newData.hasChildren(['schema','initialized','instance','initialRevision','maxSequence','sourceSavedAt','stateJSON','historyJSON','conflictsJSON','operationHashesJSON','sourceHash','sourceGist','migratedAt'])",
+      "schema": {
+        ".validate": "newData.val() == 1"
+      },
+      "initialized": {
+        ".validate": "newData.val() == true"
+      },
+      "instance": {
+        ".validate": "newData.isString()"
+      },
+      "initialRevision": {
+        ".validate": "newData.isNumber() && newData.val() >= 1"
+      },
+      "maxSequence": {
+        ".validate": "newData.isNumber()"
+      },
+      "sourceSavedAt": {
+        ".validate": "newData.isString()"
+      },
+      "stateJSON": {
+        ".validate": "newData.isString()"
+      },
+      "historyJSON": {
+        ".validate": "newData.isString()"
+      },
+      "conflictsJSON": {
+        ".validate": "newData.isString()"
+      },
+      "operationHashesJSON": {
+        ".validate": "newData.isString()"
+      },
+      "sourceHash": {
+        ".validate": "newData.isString()"
+      },
+      "sourceGist": {
+        ".validate": "newData.val() == '8a640ad7fe31d7a2ac5637dd4de868f5'"
+      },
+      "migratedAt": {
+        ".validate": "newData.isString()"
+      },
+      "entries": {
+        "$operation": {
+          ".write": "auth != null && root.child('activitiesJournalV1/initialized').val() == true && !data.exists() && newData.exists() && newData.child('uid').val() == auth.uid && ((auth != null && auth.token.firebase.sign_in_provider == 'anonymous' && newData.child('email').val() == '' && (newData.child('role').val() == 'guest' || newData.child('role').val() == 'lab')) || (auth != null && auth.token.email != null && auth.token.email_verified == true && auth.token.email.toLowerCase().matches(/^[^@]+@nvidia[.]com$/) && newData.child('email').val() == auth.token.email.toLowerCase() && ((newData.child('role').val() == 'admin' && (auth != null && auth.token.email != null && auth.token.email_verified == true && auth.token.email.toLowerCase().matches(/^[^@]+@nvidia[.]com$/) && auth.token.email.toLowerCase() == 'ymahajna@nvidia.com')) || (newData.child('role').val() == 'lab' && (((auth != null && auth.token.email != null && auth.token.email_verified == true && auth.token.email.toLowerCase().matches(/^[^@]+@nvidia[.]com$/) && auth.token.email.toLowerCase() == 'ymahajna@nvidia.com') || (root.child('activitiesAccessV1/users').child(auth.token.email.toLowerCase().replace('.', ',')).child('level').val() == 'manager' || (!root.child('activitiesAccessV1/users').child(auth.token.email.toLowerCase().replace('.', ',')).child('level').exists() && root.child('activitiesAccessV1/defaultLevel').val() == 'manager')) || (root.child('activitiesAccessV1/users').child(auth.token.email.toLowerCase().replace('.', ',')).child('level').val() == 'admin' || (!root.child('activitiesAccessV1/users').child(auth.token.email.toLowerCase().replace('.', ',')).child('level').exists() && root.child('activitiesAccessV1/defaultLevel').val() == 'admin'))) || (root.child('activitiesAccessV1/users').child(auth.token.email.toLowerCase().replace('.', ',')).child('level').val() == 'editor' || (!root.child('activitiesAccessV1/users').child(auth.token.email.toLowerCase().replace('.', ',')).child('level').exists() && root.child('activitiesAccessV1/defaultLevel').val() == 'editor')))) || (newData.child('role').val() == 'guest' && ((((auth != null && auth.token.email != null && auth.token.email_verified == true && auth.token.email.toLowerCase().matches(/^[^@]+@nvidia[.]com$/) && auth.token.email.toLowerCase() == 'ymahajna@nvidia.com') || (root.child('activitiesAccessV1/users').child(auth.token.email.toLowerCase().replace('.', ',')).child('level').val() == 'manager' || (!root.child('activitiesAccessV1/users').child(auth.token.email.toLowerCase().replace('.', ',')).child('level').exists() && root.child('activitiesAccessV1/defaultLevel').val() == 'manager')) || (root.child('activitiesAccessV1/users').child(auth.token.email.toLowerCase().replace('.', ',')).child('level').val() == 'admin' || (!root.child('activitiesAccessV1/users').child(auth.token.email.toLowerCase().replace('.', ',')).child('level').exists() && root.child('activitiesAccessV1/defaultLevel').val() == 'admin'))) || (root.child('activitiesAccessV1/users').child(auth.token.email.toLowerCase().replace('.', ',')).child('level').val() == 'editor' || (!root.child('activitiesAccessV1/users').child(auth.token.email.toLowerCase().replace('.', ',')).child('level').exists() && root.child('activitiesAccessV1/defaultLevel').val() == 'editor'))) || (root.child('activitiesAccessV1/users').child(auth.token.email.toLowerCase().replace('.', ',')).child('level').val() == 'viewer' || (!root.child('activitiesAccessV1/users').child(auth.token.email.toLowerCase().replace('.', ',')).child('level').exists() && root.child('activitiesAccessV1/defaultLevel').val() == 'viewer')))))))",
+          ".validate": "newData.hasChildren(['request','uid','email','role','actor','at']) && newData.child('request/id').val() == $operation && newData.child('request/instance').val() == root.child('activitiesJournalV1/instance').val()",
+          "uid": {
+            ".validate": "newData.isString()"
+          },
+          "email": {
+            ".validate": "newData.isString()"
+          },
+          "role": {
+            ".validate": "newData.val() == 'guest' || newData.val() == 'lab' || newData.val() == 'admin'"
+          },
+          "actor": {
+            ".validate": "newData.isString() && newData.val().length >= 2 && newData.val().length <= 100"
+          },
+          "at": {
+            ".validate": "newData.isNumber() && newData.val() == now"
+          },
+          "parents": {
+            "$parent": {
+              ".validate": "newData.val() == true && $parent != $operation && root.child('activitiesJournalV1/entries').child($parent).exists()"
+            }
+          },
+          "request": {
+            ".validate": "newData.hasChildren(['id','instance','owner']) && (newData.child('changes').hasChildren() || newData.child('resolves').hasChildren())",
+            "id": {
+              ".validate": "newData.isString()"
+            },
+            "instance": {
+              ".validate": "newData.isString()"
+            },
+            "owner": {
+              ".validate": "newData.hasChildren(['role','actor']) && newData.child('role').val() == newData.parent().parent().child('role').val() && newData.child('actor').val() == newData.parent().parent().child('actor').val()",
+              "role": {
+                ".validate": "newData.isString()"
+              },
+              "actor": {
+                ".validate": "newData.isString()"
+              },
+              "$other": {
+                ".validate": false
+              }
+            },
+            "changes": {
+              "$change": {
+                ".validate": "(newData.child('type').val() == 'task.add' || newData.child('type').val() == 'task.edit' || newData.child('type').val() == 'task.delete' || newData.child('type').val() == 'note.add' || newData.child('type').val() == 'note.edit' || newData.child('type').val() == 'note.delete' || newData.child('type').val() == 'settings.edit') && (newData.parent().parent().child('owner/role').val() == 'admin' || (newData.parent().parent().child('owner/role').val() == 'lab' && newData.child('type').val() != 'task.delete' && newData.child('type').val() != 'settings.edit') || (newData.parent().parent().child('owner/role').val() == 'guest' && newData.child('type').val() == 'task.add')) && (newData.child('type').val() == 'task.add' || newData.child('type').val() == 'settings.edit' || newData.child('taskId').isNumber()) && (newData.child('type').val() != 'task.add' || newData.hasChild('task')) && (newData.child('type').val() != 'task.edit' || newData.hasChild('fields'))",
+                "type": {
+                  ".validate": "newData.isString()"
+                },
+                "taskId": {
+                  ".validate": "newData.isNumber()"
+                },
+                "noteId": {
+                  ".validate": "newData.isString()"
+                },
+                "noteJSON": {
+                  ".validate": "newData.isString()"
+                },
+                "beforeJSON": {
+                  ".validate": "newData.isString()"
+                },
+                "afterJSON": {
+                  ".validate": "newData.isString()"
+                },
+                "task": {
+                  ".validate": "newData.parent().child('type').val() == 'task.add' && newData.hasChildren(['dataJSON','owner','daysJSON','completedAtJSON','updatesJSON']) && (newData.parent().parent().parent().child('owner/role').val() == 'admin' || (newData.child('owner').val() == '' && newData.child('daysJSON').val() == '{}' && newData.child('completedAtJSON').val() == 'null' && (newData.parent().parent().parent().child('owner/role').val() != 'guest' || newData.child('updatesJSON').val() == '[]')))",
+                  "dataJSON": {
+                    ".validate": "newData.isString()"
+                  },
+                  "owner": {
+                    ".validate": "newData.isString()"
+                  },
+                  "daysJSON": {
+                    ".validate": "newData.isString()"
+                  },
+                  "completedAtJSON": {
+                    ".validate": "newData.isString()"
+                  },
+                  "updatesJSON": {
+                    ".validate": "newData.isString()"
+                  },
+                  "$other": {
+                    ".validate": false
+                  }
+                },
+                "fields": {
+                  ".validate": "newData.hasChildren() && newData.parent().child('type').val() == 'task.edit'",
+                  "$field": {
+                    ".validate": "newData.hasChildren(['beforeJSON','afterJSON']) && ($field == 'p' || $field == 'priority' || $field == 'title' || $field == 'details' || $field == 'sub' || $field == 'owner' || $field == 'req' || $field == 'days' || $field == 'completedAt' || $field == 'createdAt') && (newData.parent().parent().parent().parent().child('owner/role').val() == 'admin' || $field == 'title' || $field == 'details' || $field == 'sub' || $field == 'req' || $field == 'completedAt')",
+                    "beforeJSON": {
+                      ".validate": "newData.isString()"
+                    },
+                    "afterJSON": {
+                      ".validate": "newData.isString()"
+                    },
+                    "$other": {
+                      ".validate": false
+                    }
+                  }
+                },
+                "$other": {
+                  ".validate": false
+                }
+              }
+            },
+            "resolves": {
+              "$target": {
+                ".validate": "newData.val() == true && (newData.parent().parent().parent().child('role').val() == 'admin' || root.child('activitiesJournalV1/entries').child($target).child('uid').val() == auth.uid)"
+              }
+            },
+            "$other": {
+              ".validate": false
+            }
+          },
+          "$other": {
+            ".validate": false
+          }
+        }
+      },
+      "$other": {
+        ".validate": false
+      }
+    },
+    "xsectionSharedV1": {
+      ".read": "auth != null && (auth.token.firebase.sign_in_provider == 'anonymous' || (auth != null && auth.token.email != null && auth.token.email_verified == true && auth.token.email.toLowerCase().matches(/^[^@]+@nvidia[.]com$/)))",
+      "requests": {
+        "$id": {
+          ".write": "(auth != null && (auth.token.firebase.sign_in_provider == 'anonymous' || (auth != null && auth.token.email != null && auth.token.email_verified == true && auth.token.email.toLowerCase().matches(/^[^@]+@nvidia[.]com$/)))) && newData.exists() && (!data.child('deleted').val() || (auth != null && auth.token.email != null && auth.token.email_verified == true && auth.token.email.toLowerCase().matches(/^[^@]+@nvidia[.]com$/) && auth.token.email.toLowerCase() == 'ymahajna@nvidia.com')) && (newData.child('deleted').val() == false || ((auth != null && auth.token.email != null && auth.token.email_verified == true && auth.token.email.toLowerCase().matches(/^[^@]+@nvidia[.]com$/) && auth.token.email.toLowerCase() == 'ymahajna@nvidia.com') && data.exists() && newData.child('dataJSON').val() == data.child('dataJSON').val()))",
+          ".validate": "newData.hasChildren(['schema','dataJSON','deleted','revision','createdBy','updatedBy','updatedAt']) && $id.matches(/^XS-[A-Z0-9-]{5,70}$/)",
+          "schema": {
+            ".validate": "newData.val() == 1"
+          },
+          "dataJSON": {
+            ".validate": "newData.isString() && newData.val().length <= 8000000"
+          },
+          "deleted": {
+            ".validate": "newData.isBoolean()"
+          },
+          "revision": {
+            ".validate": "newData.isNumber() && ((!data.exists() && newData.val() == 1) || (data.exists() && newData.val() == data.val() + 1))"
+          },
+          "createdBy": {
+            ".validate": "newData.isString() && ((!data.exists() && newData.val() == auth.uid) || (data.exists() && newData.val() == data.val()))"
+          },
+          "updatedBy": {
+            ".validate": "newData.val() == auth.uid"
+          },
+          "updatedAt": {
+            ".validate": "newData.val() == now"
+          },
+          "$other": {
+            ".validate": false
+          }
+        }
+      },
+      "$other": {
+        ".validate": false
+      }
+    }
+  }
+}
+

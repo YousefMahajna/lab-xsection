@@ -1,0 +1,1 @@
+{"name":"lab-xsection","version":"1.0.0","private":true,"scripts":{"check":"node --check shared-store.js && node --check shared-auth.js && node tests/check-html.cjs","test":"node --test tests/*.test.cjs"},"engines":{"node":">=24"}}
