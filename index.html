@@ -1831,7 +1831,7 @@ function zoomFit() {
   if (!canvasShapes.length) { zoomReset(); return; }
   let minX=Infinity,minY=Infinity,maxX=-Infinity,maxY=-Infinity;
   canvasShapes.forEach(s=>{
-    const xs=[s.x,s.x2||s.x], ys=[s.y,s.y2||s.y];
+    const xs=[s.x,s.x2??s.x], ys=[s.y,s.y2??s.y];
     xs.forEach(v=>{ minX=Math.min(minX,v); maxX=Math.max(maxX,v); });
     ys.forEach(v=>{ minY=Math.min(minY,v); maxY=Math.max(maxY,v); });
   });
@@ -1978,8 +1978,8 @@ function canvasMU(e) {
 }
 
 function shapeHit(s, p) {
-  const mx=Math.min(s.x,s.x2||s.x), my=Math.min(s.y,s.y2||s.y);
-  const mw=Math.abs((s.x2||s.x)-s.x)+10, mh=Math.abs((s.y2||s.y)-s.y)+10;
+  const mx=Math.min(s.x,s.x2??s.x), my=Math.min(s.y,s.y2??s.y);
+  const mw=Math.abs((s.x2??s.x)-s.x)+10, mh=Math.abs((s.y2??s.y)-s.y)+10;
   if (s.type==="text"||s.type==="cross") return Math.abs(p.x-s.x)<18&&Math.abs(p.y-s.y)<18;
   return p.x>=mx-6&&p.x<=mx+mw&&p.y>=my-6&&p.y<=my+mh;
 }
@@ -1993,7 +1993,7 @@ function drawShape(ctx, s, preview=false) {
   else if (s.dash==="dotted") ctx.setLineDash([3,5]);
   else ctx.setLineDash([]);
 
-  const x=s.x, y=s.y, x2=s.x2||x, y2=s.y2||y;
+  const x=s.x, y=s.y, x2=s.x2??x, y2=s.y2??y;
   const w=x2-x, h=y2-y, cx=(x+x2)/2, cy=(y+y2)/2;
 
   switch(s.type) {
@@ -2034,7 +2034,7 @@ function drawShape(ctx, s, preview=false) {
         ctx.closePath(); ctx.fillStyle=s.color; ctx.fill();
       }); break;
     case "cutline":
-      ctx.setLineDash([14,6]);
+      ctx.setLineDash(s.dashOverride?(s.dash==='dashed'?[14,6]:s.dash==='dotted'?[3,5]:[]):[14,6]);
       ctx.strokeStyle = s.color||"#4A90D9";
       ctx.lineWidth = (s.lineW||2)+0.5;
       ctx.beginPath(); ctx.moveTo(x,y); ctx.lineTo(x2,y2); ctx.stroke();
@@ -2123,7 +2123,7 @@ function drawShape(ctx, s, preview=false) {
       ctx.stroke(); break;
     case "dimline": {
       // linear dimension with real label
-      ctx.setLineDash([]);
+      ctx.setLineDash(s.dash==='dashed'?[10,5]:s.dash==='dotted'?[3,5]:[]);
       const da=Math.atan2(y2-y,x2-x), dp=da+Math.PI/2, tl=10;
       // extension lines
       [[x,y],[x2,y2]].forEach(([px,py])=>{
@@ -2455,8 +2455,8 @@ function canvasRedraw() {
     if (i===canvasSelected) {
       _ctx.save();
       _ctx.strokeStyle="#fff"; _ctx.lineWidth=1.5/cvZoom; _ctx.setLineDash([4/cvZoom,3/cvZoom]);
-      const bx=Math.min(s.x,s.x2||s.x)-6, by=Math.min(s.y,s.y2||s.y)-6;
-      const bw=Math.abs((s.x2||s.x)-s.x)+12, bh=Math.abs((s.y2||s.y)-s.y)+12;
+      const bx=Math.min(s.x,s.x2??s.x)-6, by=Math.min(s.y,s.y2??s.y)-6;
+      const bw=Math.abs((s.x2??s.x)-s.x)+12, bh=Math.abs((s.y2??s.y)-s.y)+12;
       _ctx.strokeRect(bx,by,bw,bh);
       _ctx.restore();
     }
@@ -2502,8 +2502,9 @@ function canvasGetDataURL() {
   // compute bounding box of all shapes
   let minX=Infinity,minY=Infinity,maxX=-Infinity,maxY=-Infinity;
   canvasShapes.forEach(s=>{
-    [s.x,s.x2||s.x].forEach(v=>{ minX=Math.min(minX,v); maxX=Math.max(maxX,v); });
-    [s.y,s.y2||s.y].forEach(v=>{ minY=Math.min(minY,v); maxY=Math.max(maxY,v); });
+    const bounds=shapeBoundsForExport(s);
+    minX=Math.min(minX,bounds.left);maxX=Math.max(maxX,bounds.right);
+    minY=Math.min(minY,bounds.top);maxY=Math.max(maxY,bounds.bottom);
   });
   if (!isFinite(minX)) { minX=0; minY=0; maxX=_cvs.width; maxY=_cvs.height; }
   const pad=40;
@@ -3770,6 +3771,8 @@ renderDashboard=safeRender(renderDashboard);renderRequests=safeRender(renderRequ
 <script src="workspace-core.js"></script>
 <script src="image-storage.js"></script>
 <script src="workspace.js"></script>
+<script src="line-editor.js"></script>
+<script src="editable-templates.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/pptxgenjs@3.12.0/dist/pptxgen.bundle.js"></script>
 </body>
 </html>
