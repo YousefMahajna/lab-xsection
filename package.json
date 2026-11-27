@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "private": true,
   "scripts": {
-    "check": "node --check shared-store.js && node --check shared-auth.js && node --check part-resize.js && node --check editable-templates.js && node --check line-editor.js && node --check workspace.js && node --check workspace-core.js && node --check image-storage.js && node tests/check-html.cjs",
+    "check": "node --check shared-store.js && node --check shared-auth.js && node --check picture-editor.js && node --check part-resize.js && node --check editable-templates.js && node --check line-editor.js && node --check workspace.js && node --check workspace-core.js && node --check image-storage.js && node tests/check-html.cjs",
     "test": "node --test tests/*.test.cjs",
     "test:browser": "node tests/workspace.browser.cjs"
   },
