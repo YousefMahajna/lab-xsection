@@ -1910,7 +1910,7 @@ function canvasMD(e) {
   canvasDrawing = true;
   canvasStart = p;
   canvasCurrent = { type:canvasTool, x:p.x, y:p.y, x2:p.x, y2:p.y,
-    color:canvasColor, lineW:canvasLineW, dash:canvasDash, fill:canvasFill };
+    color:canvasColor, lineW:canvasLineW, dash:canvasDash, fill:canvasFill, dashOverride:true };
 }
 
 function canvasMV(e) {
@@ -1989,9 +1989,8 @@ function drawShape(ctx, s, preview=false) {
   ctx.strokeStyle = s.color||"#76B900";
   ctx.lineWidth   = s.lineW||2;
   ctx.fillStyle   = s.fill&&s.fill!=="none" ? s.fill : "transparent";
-  if (s.dash==="dashed") ctx.setLineDash([10,5]);
-  else if (s.dash==="dotted") ctx.setLineDash([3,5]);
-  else ctx.setLineDash([]);
+  ctx.setLineDash(linePattern(s.dash,s.lineW));
+  ctx.lineCap=["dotted","dashdot"].includes(s.dash)?"round":"butt";
 
   const x=s.x, y=s.y, x2=s.x2??x, y2=s.y2??y;
   const w=x2-x, h=y2-y, cx=(x+x2)/2, cy=(y+y2)/2;
@@ -2034,7 +2033,7 @@ function drawShape(ctx, s, preview=false) {
         ctx.closePath(); ctx.fillStyle=s.color; ctx.fill();
       }); break;
     case "cutline":
-      ctx.setLineDash(s.dashOverride?(s.dash==='dashed'?[14,6]:s.dash==='dotted'?[3,5]:[]):[14,6]);
+      ctx.setLineDash(s.dashOverride?linePattern(s.dash,s.lineW):[14,6]);
       ctx.strokeStyle = s.color||"#4A90D9";
       ctx.lineWidth = (s.lineW||2)+0.5;
       ctx.beginPath(); ctx.moveTo(x,y); ctx.lineTo(x2,y2); ctx.stroke();
@@ -2123,7 +2122,7 @@ function drawShape(ctx, s, preview=false) {
       ctx.stroke(); break;
     case "dimline": {
       // linear dimension with real label
-      ctx.setLineDash(s.dash==='dashed'?[10,5]:s.dash==='dotted'?[3,5]:[]);
+      ctx.setLineDash(linePattern(s.dash,s.lineW));
       const da=Math.atan2(y2-y,x2-x), dp=da+Math.PI/2, tl=10;
       // extension lines
       [[x,y],[x2,y2]].forEach(([px,py])=>{
@@ -2714,7 +2713,7 @@ function renderNew() {
         </select>
         <span style="font-size:10px;color:var(--text3);font-weight:700">LINE</span>
         <select onchange="setDash(this.value)" style="font-size:11px;padding:2px 4px;width:auto">
-          <option value="solid">Solid</option><option value="dashed">Dashed</option><option value="dotted">Dotted</option>
+          <option value="solid">Solid</option><option value="dashed">Dashed</option><option value="dotted">Dotted</option><option value="dashdot">Dash-dot</option>
         </select>
         <span style="font-size:10px;color:var(--text3);font-weight:700">FILL</span>
         <div id="fill-swatches" style="display:flex;gap:4px;align-items:center;flex-wrap:wrap">
